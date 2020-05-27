@@ -1,6 +1,6 @@
 # cuehBot Discord Bot
 
-![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/zerasul/cuehbot/0.0.3?color=green&logo=docker)
+[![Docker Image Version (tag latest semver)](https://img.shields.io/docker/v/zerasul/cuehbot/0.0.3?color=green&logo=docker)](https://hub.docker.com/r/zerasul/cuehbot)
 
 Cueh Bot is a Discord bot for download and play music from youtube videos. This bot provides the next commands:
 
