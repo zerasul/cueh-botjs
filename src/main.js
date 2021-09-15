@@ -52,6 +52,7 @@ client.on('message', message => {
         if (connection != null) {
             urlyt = message.content.split(" ");
             if (urlyt.length > 1) {
+                message.reply("Reproduciendo Video...");
                 dispatcher = connection.play(ytdl(urlyt[1], { filter: "audioonly" }));
             } else {
                 message.reply("Te falta la URL del video, cueh");

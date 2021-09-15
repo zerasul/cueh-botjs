@@ -1,4 +1,4 @@
-FROM node:14.3.0-stretch
+FROM node:buster
 COPY . /opt/cuehbot
 WORKDIR /opt/cuehbot
 RUN ["npm", "install"]
