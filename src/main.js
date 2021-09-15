@@ -28,6 +28,7 @@ client.on('message', message => {
         message.reply("Reproduciendo Balleneros (Ahora si jorge...)");
 
         if (connection != null) {
+            
             dispatcher = connection.play(ytdl('https://www.youtube.com/watch?v=6bQ3lZRMI6c', { filter: "audioonly" }));
             dispatcher.on('finish', () => {
                 dispatcher.destroy();
