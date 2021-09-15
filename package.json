@@ -2,7 +2,7 @@
     "name": "cueh-js-bot",
     "description": "cueh bot for js",
     "authors": "zerasul",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "main": "src/main.js",
     "dependencies": {
         "@discordjs/opus": "0.3.2",
