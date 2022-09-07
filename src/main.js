@@ -1,27 +1,123 @@
-const Discord = require('discord.js');
+const {REST, Routes, Client, GatewayIntentBits, SlashCommandBuilder} = require('discord.js');
+const {NoSubscriberBehavior, createReadStream, joinVoiceChannel,AudioPlayerStatus, createAudioPlayer, createAudioResource, generateDependencyReport  } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
-const fs = require('fs');
+const {join} = require('path')
 
-const client = new Discord.Client();
+
 var token = process.env.DISCORD_TOKEN;
+var CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+
+
+
+const commands = [
+    new SlashCommandBuilder()
+        .setName('cuehjoin').setDescription('Join to current Voice Channel'),
+	new SlashCommandBuilder().setName('cuehballeneros').setDescription('Plays "somos balleneros" futurama song.'),
+	new SlashCommandBuilder().setName('cuehstop').setDescription('Stop Current song.'),
+	new SlashCommandBuilder().setName('cuehmondongo').setDescription('Plays "mondongo" Goku song'),
+    new SlashCommandBuilder().setName('cuehplay').setDescription('Start Play the Url Song')
+    .addStringOption(option =>
+        option.setName('url').setDescription('Current Youtube video URL')),
+];
+
+const rest = new REST({ version: '10' }).setToken(token);
+
+(async () => {
+	try {
+		console.log('Started refreshing application (/) commands.');
+
+		await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+
+		console.log('Successfully reloaded application (/) commands.');
+	} catch (error) {
+		console.error(error);
+	}
+})();
+
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 connection = null;
-dispatcher = null;
+audioPlayer = null;
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('message', message => {
+
+client.on('interactionCreate', async (interaction) => {
+	if (!interaction.isChatInputCommand()) return;
+    
+	if (interaction.commandName === 'cuehjoin') {
+        
+        if (interaction.member.voice.channel) {
+            let channel = interaction.member.voice.channel;
+            connection = joinVoiceChannel({
+                channelId: channel.id,
+	            guildId: channel.guild.id,
+	            adapterCreator: channel.guild.voiceAdapterCreator,
+                selfDeaf: false
+                }
+            );
+            audioPlayer = createAudioPlayer();
+            connection.subscribe(audioPlayer);
+            interaction.reply("Conectando al canal de voz...");
+           
+        } else {
+           interaction.reply("Necesitas conectarte a un canal de voz primero, cueh");
+        }
+        
+	}
+
+    if(interaction.commandName == 'cuehstop'){
+        if(audioPlayer!==null){
+            audioPlayer.stop();
+            interaction.reply("Parando ejecucion....");
+        }
+    }
+
+    if(interaction.commandName == 'cuehplay'){
+        let url = interaction.options.getString('url');
+        if(url == null){
+            interaction.reply("Falta la URL del video...");
+            return;
+        }
+        console.log(url);
+        const stream = ytdl(url, {filter: 'audioonly'});
+        const resource = createAudioResource(stream);
+        audioPlayer.play(resource);
+        audioPlayer.on(AudioPlayerStatus.Playing, () => {
+            console.log('The audio player has started playing!');
+        });
+        interaction.reply("Reproduciendo Video...");
+    }
+    if(interaction.commandName == 'cuehmondongo'){
+        playMondongo();
+        interaction.reply("Mondongo");
+    }
+});
+
+function play(url){
+    
+   
+}
+
+function playMondongo(){
+    audioPlayer = createAudioPlayer({behaviors: {
+		noSubscriber: NoSubscriberBehavior.Pause,
+	}});
+   
+    const resource = createAudioResource(join('./', 'mondongo.mp3'));
+    connection.subscribe(audioPlayer);
+    audioPlayer.play(resource);
+    audioPlayer.on(AudioPlayerStatus.Playing, () => {
+        console.log('The audio player has started playing!');
+    });
+}
+
+/*
+client.on('interactionCreate', message => {
 
 
     if (message.content.startsWith('!cuehjoin')) {
-        if (message.member.voice.channel) {
-            message.member.voice.channel.join().then(conn => {
-                connection = conn;
-                message.reply("Conectando al canal de voz...");
-            });
-        } else {
-            message.reply("Necesitas conectarte a un canal de voz primero, cueh");
-        }
+        
     }
     if (message.content.startsWith("!cuehballeneros")) {
 
@@ -62,6 +158,6 @@ client.on('message', message => {
             message.reply("Primero conectate a un canal de voz, cueh");
         }
     }
-});
+});*/
 
 client.login(token);
